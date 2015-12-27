@@ -1,0 +1,38 @@
+rails todo
+
++ fix turn model
+ + zoka .
+ - bitgem .
+- add train model
+- animate train wheels
+- smoke pufs
+- locomotive
+- train station
+- debris
+- landscape
+
+- crossing?
+
+- camera follows train
+
++ add tracks to matrix, matrix to path
+- calculate path errors
+- make train follow path
+- variable train vagons
+
+- erase elements
+- replace elements
+- prevent stacking of elements
+
+- gui for picking elements
+- gui play button
+- gui clear
+- gui rotate
+- gui about
+- gui change camera
+- gui warning if path is not complete
+- gui editor view / play view
+
+- sound of train
+- sound of laying tracks
+- sound of error if track is not complete
