@@ -78,6 +78,7 @@
 				requestAnimationFrame( render );
 				controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 				stats.update();
+				if(g_startPlaying) draw();
 				renderer.render(scene, camera);
 			};
 

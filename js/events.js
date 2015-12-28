@@ -40,11 +40,21 @@ function onKeyDown(e)
 		element_at_hand.mesh.visible = true;
 		current_rotation = Math.floor(element_at_hand.mesh.rotation.z/(Math.PI/2))%4;
 	}
+	else if (e.keyCode == 80) { //p key play train
+		console.log('start playing');
+		g_startPlaying = !g_startPlaying;
+	}
+	else if (e.keyCode == 40) { //down key slow down
+		DELTA -= 0.1;
+	}
+	else if (e.keyCode == 38) { //up key faster
+		DELTA += 0.1;
+	}
 }
 
 function onMouseDown (event)
 {
-	if (!event.ctrlKey) {
+	if ((!event.ctrlKey)&&(!g_startPlaying)) {
 		//if eraser is selected, delete element in this place
 		
 		//if same element already in this place, ignore click

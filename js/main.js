@@ -6,6 +6,12 @@
 var rails_straight = {'start_element':true};
 //curve
 var rails_turn = {};
+//cart
+var train_cart = {};
+//locomotive
+var train_loco = {};
+
+var g_startPlaying = false;
 
 //rail matrix
 var rail_map = new Array(MAP_SIZE);
@@ -27,6 +33,8 @@ function load_models()
 {
 	globalJSONloader.load( "media/models/rail_flat_straight.js", loadObject(rails_straight));
 	globalJSONloader.load( "media/models/rail_flat_turn.js", loadObject(rails_turn));
+	globalJSONloader.load( "media/models/minecart_v1.json", loadTrainObject(train_cart));
+	globalJSONloader.load( "media/models/handpropelled_railroad_car.json", loadTrainObject(train_loco));
 	element_at_hand = rails_straight;
 }
 
@@ -52,6 +60,18 @@ function loadObject( gobject )
 	}
 }
 
+function loadTrainObject( gobject ) 
+{
+	return function (geometry, materials ) 
+	{
+		materials[ 0 ].shading = THREE.FlatShading;
+		gobject.mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+		gobject.mesh.name = 'cart';
+		scene.add( gobject.mesh );
+	}
+}
+
+
 function checkElementDirectionDown(x,y)
 {
 	//we only allow straight elements of rotation 0 and 2 and turns of rotation 2 and 3
@@ -62,7 +82,7 @@ function checkElementDirectionDown(x,y)
 			//if this is first track element that means we made a full circle!
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -83,7 +103,7 @@ function checkElementDirectionDown(x,y)
 		{
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -100,7 +120,7 @@ function checkElementDirectionDown(x,y)
 		{
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -127,7 +147,7 @@ function checkElementDirectionUp(x,y)
 			//if this is first track element that means we made a full circle!
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -148,7 +168,7 @@ function checkElementDirectionUp(x,y)
 		{
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -165,7 +185,7 @@ function checkElementDirectionUp(x,y)
 		{
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -193,7 +213,7 @@ function checkElementDirectionRight(x,y)
 			//if this is first track element that means we made a full circle!
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -213,7 +233,7 @@ function checkElementDirectionRight(x,y)
 		{
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -230,7 +250,7 @@ function checkElementDirectionRight(x,y)
 		{
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -257,7 +277,7 @@ function checkElementDirectionLeft(x,y)
 			//if this is first track element that means we made a full circle!
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -278,7 +298,7 @@ function checkElementDirectionLeft(x,y)
 		{
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
@@ -295,7 +315,7 @@ function checkElementDirectionLeft(x,y)
 		{
 			if((track[0].x == x)&&(track[0].y == y))
 			{
-				alert("track is completed!");
+				console.log("track is completed!");
 				console.log(track);
 				NUM_TRACK_SEGMENTS = track.length;
 				return;

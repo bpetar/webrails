@@ -23,6 +23,7 @@ rails todo
 - erase elements
 - replace elements
 - prevent stacking of elements
+- prevent placing track out of the map
 
 - gui for picking elements
 - gui play button

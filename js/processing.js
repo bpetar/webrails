@@ -2,7 +2,7 @@ var MAP_SIZE = 100;
 var SIZE = 10;
 var WAGGON_SIZE = 0.4*SIZE;
 var LINK_SIZE = 0.2*SIZE;
-var DELTA = 2;
+var DELTA = 0.2;
 var CA = [ 0, 0 ];
 var SA = [ 0, 0 ];
 
@@ -12,7 +12,7 @@ var DIRECTION_LEFT = 1;
 var DIRECTION_RIGHT = 2;
 var track = [];
 
-var NUM_TRAIN_SEGMENTS = 7;
+var NUM_TRAIN_SEGMENTS = 2;
 var X1 = [];
 var Y1 = [];
 var X2 = [];
@@ -60,7 +60,7 @@ function setup()
   
   TRACK_LENGTH = 0;
   for (i=0; i<NUM_TRACK_SEGMENTS; i++)
-    TRACK_LENGTH += lengths[track[i]];
+    TRACK_LENGTH += lengths[track[i].direction];
   a = 2*Math.asin(1.0*WAGGON_SIZE/SIZE);
   CA[0] = Math.cos(a);
   SA[0] = Math.sin(a);
@@ -74,27 +74,27 @@ function setup()
 }
 
 
-void draw()
+function draw()
 {
   var i, j, ni=0, foundInNext, n;
-  /*float x=0, y=0, a, tx, ty, tmp, d, l, h;
-  float x0, y0, nx0=0, ny0=0, nx1=0, nx2=0, ny1=0, ny2=0, ntx=0, nty=0, nx=0, ny=0;
-  float segmentLen;*/
+  var x=0, y=0, a, tx, ty, tmp, d, l, h;
+  var x0, y0, nx0=0, ny0=0, nx1=0, nx2=0, ny1=0, ny2=0, ntx=0, nty=0, nx=0, ny=0;
+  var segmentLen;
   
   //drawTracks();
 
-  /*x0 = SIZE;
+  x0 = SIZE;
   y0 = SIZE/2;
   tx = 1;
   ty = 0;
   i = 0;
   a = 0;
-  d = curr_dist;*/
+  d = curr_dist;
 
   // Find current segment index (i), orientation (tx, ty, a) and offset withing the segment (d)
 
-  /*while (d > lengths[track[i]]) {
-    j = track[i];
+  while (d > lengths[track[i].direction]) {
+    j = track[i].direction;
     x0 += DX[j][0]*tx + DX[j][1]*ty;
     y0 += DY[j][0]*tx + DY[j][1]*ty;
     tmp = TX[j][0]*tx + TX[j][1]*ty;
@@ -103,28 +103,28 @@ void draw()
     a += DA[j];
     d -= lengths[j];
     i++;
-  }*/
+  }
 
   // Find current starting position (x, y)
 
-  /*switch (track[i]) {
+  switch (track[i].direction) {
     case 0:
-    x = x0 + d*tx;
-    y = y0 + d*ty;
-    break;
+		x = x0 + d*tx;
+		y = y0 + d*ty;
+		break;
     case 1:
-    tmp = 2*d/SIZE;
-    x = x0 + 0.5*SIZE*ty + 0.5*SIZE*cos(PI/2-tmp+a);
-    y = y0 - 0.5*SIZE*tx + 0.5*SIZE*sin(PI/2-tmp+a);
-    break;
+		tmp = 2*d/SIZE;
+		x = x0 + 0.5*SIZE*ty + 0.5*SIZE*Math.cos(Math.PI/2-tmp+a);
+		y = y0 - 0.5*SIZE*tx + 0.5*SIZE*Math.sin(Math.PI/2-tmp+a);
+		break;
     case 2:
-    tmp = 2*d/SIZE;
-    x = x0 - 0.5*SIZE*ty+0.5*SIZE*cos(a+tmp-PI/2);
-    y = y0 + 0.5*SIZE*tx+0.5*SIZE*sin(a+tmp-PI/2);
-    break;
-  }*/
+		tmp = 2*d/SIZE;
+		x = x0 - 0.5*SIZE*ty+0.5*SIZE*Math.cos(a+tmp-Math.PI/2);
+		y = y0 + 0.5*SIZE*tx+0.5*SIZE*Math.sin(a+tmp-Math.PI/2);
+		break;
+  }
 
-  /*foundInNext = 1;
+  foundInNext = 1;
 
   for (n=0; n<2*NUM_TRAIN_SEGMENTS-1; n++) {
 
@@ -136,7 +136,7 @@ void draw()
     // Find next segment index (ni), orientation (ntx, nty), position (nx0, ny0) and boundaries (nx1, ny1, nx2, ny2)
   
     if (foundInNext == 1) {
-      j = track[i];
+      j = track[i].direction;
       nx0 = x0 + DX[j][0]*tx + DX[j][1]*ty;
       ny0 = y0 + DY[j][0]*tx + DY[j][1]*ty;
       ntx = TX[j][0]*tx + TX[j][1]*ty;
@@ -163,73 +163,73 @@ void draw()
     // Try to find the next point in the next segment
     
     foundInNext = 0;
-    switch (track[ni]) {
+    switch (track[ni].direction) {
       case 0:
-      d = (ny0 - y)*ntx + (x - nx0)*nty;
-      if (segmentLen*segmentLen >= d*d) {
-        tmp = sqrt(segmentLen*segmentLen - d*d);
-        nx = -nty*d + ntx*tmp + x;
-        ny =  ntx*d + nty*tmp + y;
-        if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2) {
-          foundInNext = 1;
-        } else {
-          nx = -nty*d - ntx*tmp + x;
-          ny =  ntx*d - nty*tmp + y;
-          if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2)
-            foundInNext = 1;
-        }
-      }
-      break;
+		  d = (ny0 - y)*ntx + (x - nx0)*nty;
+		  if (segmentLen*segmentLen >= d*d) {
+			tmp = Math.sqrt(segmentLen*segmentLen - d*d);
+			nx = -nty*d + ntx*tmp + x;
+			ny =  ntx*d + nty*tmp + y;
+			if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2) {
+			  foundInNext = 1;
+			} else {
+			  nx = -nty*d - ntx*tmp + x;
+			  ny =  ntx*d - nty*tmp + y;
+			  if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2)
+				foundInNext = 1;
+			}
+		  }
+		  break;
       case 1:
-      tmp = (nx0+0.5*SIZE*nty-x);
-      d = tmp*tmp;
-      tmp = (ny0-0.5*SIZE*ntx-y);
-      d = sqrt(d + tmp*tmp);
-      if (d <= segmentLen + 0.5*SIZE) {
-        l = 0.5*(segmentLen*segmentLen - 0.25*SIZE*SIZE + d*d)/d;
-        h = sqrt(segmentLen*segmentLen - l*l);
-        l = l/d;
-        h = h/d;
-        nx = l*(nx0+0.5*SIZE*nty-x) + h*(ny0-0.5*SIZE*ntx-y) + x;
-        ny = l*(ny0-0.5*SIZE*ntx-y) - h*(nx0+0.5*SIZE*nty-x) + y;
-        if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2) {
-          foundInNext = 1;
-        } else {
-          nx = l*(nx0+0.5*SIZE*nty-x) - h*(ny0-0.5*SIZE*ntx-y) + x;
-          ny = l*(ny0-0.5*SIZE*ntx-y) + h*(nx0+0.5*SIZE*nty-x) + y;
-          if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2)
-            foundInNext = 1;
-        }
-      }
-      break;
+		  tmp = (nx0+0.5*SIZE*nty-x);
+		  d = tmp*tmp;
+		  tmp = (ny0-0.5*SIZE*ntx-y);
+		  d = Math.sqrt(d + tmp*tmp);
+		  if (d <= segmentLen + 0.5*SIZE) {
+			l = 0.5*(segmentLen*segmentLen - 0.25*SIZE*SIZE + d*d)/d;
+			h = Math.sqrt(segmentLen*segmentLen - l*l);
+			l = l/d;
+			h = h/d;
+			nx = l*(nx0+0.5*SIZE*nty-x) + h*(ny0-0.5*SIZE*ntx-y) + x;
+			ny = l*(ny0-0.5*SIZE*ntx-y) - h*(nx0+0.5*SIZE*nty-x) + y;
+			if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2) {
+			  foundInNext = 1;
+			} else {
+			  nx = l*(nx0+0.5*SIZE*nty-x) - h*(ny0-0.5*SIZE*ntx-y) + x;
+			  ny = l*(ny0-0.5*SIZE*ntx-y) + h*(nx0+0.5*SIZE*nty-x) + y;
+			  if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2)
+				foundInNext = 1;
+			}
+		  }
+		  break;
       case 2:
-      tmp = (nx0-0.5*SIZE*nty-x);
-      d = tmp*tmp;
-      tmp = (ny0+0.5*SIZE*ntx-y);
-      d = sqrt(d + tmp*tmp);
-      if (d <= segmentLen + 0.5*SIZE) {
-        l = 0.5*(segmentLen*segmentLen - 0.25*SIZE*SIZE + d*d)/d;
-        h = sqrt(segmentLen*segmentLen - l*l);
-        l = l/d;
-        h = h/d;
-        nx = l*(nx0-0.5*SIZE*nty-x) + h*(ny0+0.5*SIZE*ntx-y) + x;
-        ny = l*(ny0+0.5*SIZE*ntx-y) - h*(nx0-0.5*SIZE*nty-x) + y;
-        if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2) {
-          foundInNext = 1;
-        } else {
-          nx = l*(nx0-0.5*SIZE*nty-x) - h*(ny0+0.5*SIZE*ntx-y) + x;
-          ny = l*(ny0+0.5*SIZE*ntx-y) + h*(nx0-0.5*SIZE*nty-x) + y;
-          if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2)
-            foundInNext = 1;
-        }
-      }
-      break;
+		  tmp = (nx0-0.5*SIZE*nty-x);
+		  d = tmp*tmp;
+		  tmp = (ny0+0.5*SIZE*ntx-y);
+		  d = Math.sqrt(d + tmp*tmp);
+		  if (d <= segmentLen + 0.5*SIZE) {
+			l = 0.5*(segmentLen*segmentLen - 0.25*SIZE*SIZE + d*d)/d;
+			h = Math.sqrt(segmentLen*segmentLen - l*l);
+			l = l/d;
+			h = h/d;
+			nx = l*(nx0-0.5*SIZE*nty-x) + h*(ny0+0.5*SIZE*ntx-y) + x;
+			ny = l*(ny0+0.5*SIZE*ntx-y) - h*(nx0-0.5*SIZE*nty-x) + y;
+			if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2) {
+			  foundInNext = 1;
+			} else {
+			  nx = l*(nx0-0.5*SIZE*nty-x) - h*(ny0+0.5*SIZE*ntx-y) + x;
+			  ny = l*(ny0+0.5*SIZE*ntx-y) + h*(nx0-0.5*SIZE*nty-x) + y;
+			  if (nx >= nx1 && nx <= nx2 && ny >= ny1 && ny <= ny2)
+				foundInNext = 1;
+			}
+		  }
+		  break;
     }
   
     // If not found try in the current segment
   
     if (foundInNext == 0) {
-      switch (track[i]) {
+      switch (track[i].direction) {
       case 0:
         nx = x + segmentLen*tx;
         ny = y + segmentLen*ty;
@@ -269,7 +269,7 @@ void draw()
       ty = nty;
       i = ni;
     }
-  }*/
+  }
 
   
   /*stroke(#301000);
@@ -277,30 +277,39 @@ void draw()
   for (i=0; i<NUM_TRAIN_SEGMENTS-1; i++) {
     line(X1[2*i+1], Y1[2*i+1], X2[2*i+1], Y2[2*i+1]);
   }
-  strokeWeight(2);
+  strokeWeight(2);*/
   for (i=0; i<NUM_TRAIN_SEGMENTS; i++) {
-    pushMatrix();
-    translate(0.5*(X1[2*i]+X2[2*i]), 0.5*(Y1[2*i]+Y2[2*i]));
-    h = atan2(Y2[2*i]-Y1[2*i], X2[2*i]-X1[2*i]);
-    rotate(h+PI);
+    /*pushMatrix();*/
+	
+    //translate(0.5*(X1[2*i]+X2[2*i]), 0.5*(Y1[2*i]+Y2[2*i]));
+    h = Math.atan2(Y2[2*i]-Y1[2*i], X2[2*i]-X1[2*i]);
+    //rotate(h+PI);
+	
     if (i == 0) {
-      stroke(#000000);
-      fill(#208020);
-      rect(-0.6*WAGGON_SIZE, -0.35*WAGGON_SIZE, 1.35*WAGGON_SIZE, 0.7*WAGGON_SIZE, 10);
-      rect(-0.65*WAGGON_SIZE, -0.4*WAGGON_SIZE, 0.65*WAGGON_SIZE, 0.8*WAGGON_SIZE, 10);
-      fill(#104810);
-      ellipse(0.4*WAGGON_SIZE, 0, 0.2*WAGGON_SIZE, 0.2*WAGGON_SIZE);
+		//locomotive
+		train_loco.mesh.position.x = 0.5*(X1[2*i]+X2[2*i]);
+		train_loco.mesh.position.y = 0.5*(Y1[2*i]+Y2[2*i]);
+		train_loco.mesh.rotation.z = h+Math.PI/2;
+		  // stroke(#000000);
+		  // fill(#208020);
+		  // rect(-0.6*WAGGON_SIZE, -0.35*WAGGON_SIZE, 1.35*WAGGON_SIZE, 0.7*WAGGON_SIZE, 10);
+		  // rect(-0.65*WAGGON_SIZE, -0.4*WAGGON_SIZE, 0.65*WAGGON_SIZE, 0.8*WAGGON_SIZE, 10);
+		  // fill(#104810);
+		  // ellipse(0.4*WAGGON_SIZE, 0, 0.2*WAGGON_SIZE, 0.2*WAGGON_SIZE);
     }
     else {
-      stroke(#000000);
-      fill(#c03020);
-      rect(-0.71*WAGGON_SIZE, -0.35*WAGGON_SIZE, 1.3*WAGGON_SIZE, 0.7*WAGGON_SIZE, 10);
+		train_cart.mesh.position.x = 0.5*(X1[2*i]+X2[2*i]);
+		train_cart.mesh.position.y = 0.5*(Y1[2*i]+Y2[2*i]);
+		train_cart.mesh.rotation.z = h+Math.PI/2;
+		  // stroke(#000000);
+		  // fill(#c03020);
+		  // rect(-0.71*WAGGON_SIZE, -0.35*WAGGON_SIZE, 1.3*WAGGON_SIZE, 0.7*WAGGON_SIZE, 10);
     }
-    popMatrix();
-  }*/
+    /*popMatrix();*/
+  }
 
-  /*curr_dist -= DELTA;
+  curr_dist -= DELTA;
   if (curr_dist < 0)
-    curr_dist += TRACK_LENGTH;*/
+    curr_dist += TRACK_LENGTH;
 }
 
