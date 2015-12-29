@@ -24,21 +24,21 @@ function onKeyDown(e)
 	}
 	else if (e.keyCode == 82) { //r key rotate
 		element_at_hand.mesh.rotation.z += Math.PI/2;
-		current_rotation = Math.floor(element_at_hand.mesh.rotation.z/(Math.PI/2))%4;
+		current_rotation = Math.round(element_at_hand.mesh.rotation.z/(Math.PI/2))%4;
 	}
 	else if (e.keyCode == 49) { //1 key select rail straight
 		current_element = 1;
 		element_at_hand.mesh.visible = false;
 		element_at_hand = rails_straight;
 		element_at_hand.mesh.visible = true;
-		current_rotation = Math.floor(element_at_hand.mesh.rotation.z/(Math.PI/2))%4;
+		current_rotation = Math.round(element_at_hand.mesh.rotation.z/(Math.PI/2))%4;
 	}
 	else if (e.keyCode == 50) { //2 key select rail turn
 		current_element = 2;
 		element_at_hand.mesh.visible = false;
 		element_at_hand = rails_turn;
 		element_at_hand.mesh.visible = true;
-		current_rotation = Math.floor(element_at_hand.mesh.rotation.z/(Math.PI/2))%4;
+		current_rotation = Math.round(element_at_hand.mesh.rotation.z/(Math.PI/2))%4;
 	}
 	else if (e.keyCode == 80) { //p key play train
 		console.log('start playing');
@@ -61,6 +61,9 @@ function onMouseDown (event)
 		
 		//if different element is placed there, delete old element and place new one.
 	
+		//cloning fucks up rotation, 3Pi/2 becomes -Pi/2(three.js bug?), which I admit is pretty much the same, matematically speaking,
+		//but it fucks up my rotation logic somehow so we have to save it and assign it manualy
+		//element_at_hand.mesh
 		element_at_hand.mesh = element_at_hand.mesh.clone();
 		element_at_hand.mesh.position.y = lastMousePosition.y;
 		element_at_hand.mesh.position.x = lastMousePosition.x;
@@ -75,6 +78,8 @@ function onMouseDown (event)
 		
 		addElementToMatrix();
 		convertMatrixToTrack();
+
+		NUM_TRACK_SEGMENTS = track.length;
 		
 		if(NUM_TRACK_SEGMENTS != 0)
 			setup();

@@ -12,7 +12,7 @@ var DIRECTION_LEFT = 1;
 var DIRECTION_RIGHT = 2;
 var track = [];
 
-var NUM_TRAIN_SEGMENTS = 2;
+var NUM_TRAIN_SEGMENTS = 3;
 var X1 = [];
 var Y1 = [];
 var X2 = [];
@@ -77,14 +77,14 @@ function setup()
 function draw()
 {
   var i, j, ni=0, foundInNext, n;
-  var x=0, y=0, a, tx, ty, tmp, d, l, h;
+  var x=10, y=10, a, tx, ty, tmp, d, l, h;
   var x0, y0, nx0=0, ny0=0, nx1=0, nx2=0, ny1=0, ny2=0, ntx=0, nty=0, nx=0, ny=0;
   var segmentLen;
   
   //drawTracks();
 
-  x0 = SIZE;
-  y0 = SIZE/2;
+  x0 = offset.x*SIZE;
+  y0 = -(offset.y+0.5)*SIZE;
   tx = 1;
   ty = 0;
   i = 0;
@@ -287,9 +287,9 @@ function draw()
 	
     if (i == 0) {
 		//locomotive
-		train_loco.mesh.position.x = 0.5*(X1[2*i]+X2[2*i]);
-		train_loco.mesh.position.y = 0.5*(Y1[2*i]+Y2[2*i]);
-		train_loco.mesh.rotation.z = h+Math.PI/2;
+		train_cart[0].mesh.position.x = 0.5*(X1[2*i]+X2[2*i]);
+		train_cart[0].mesh.position.y = -0.5*(Y1[2*i]+Y2[2*i]);
+		train_cart[0].mesh.rotation.z = -(h+Math.PI/2);
 		  // stroke(#000000);
 		  // fill(#208020);
 		  // rect(-0.6*WAGGON_SIZE, -0.35*WAGGON_SIZE, 1.35*WAGGON_SIZE, 0.7*WAGGON_SIZE, 10);
@@ -298,9 +298,9 @@ function draw()
 		  // ellipse(0.4*WAGGON_SIZE, 0, 0.2*WAGGON_SIZE, 0.2*WAGGON_SIZE);
     }
     else {
-		train_cart.mesh.position.x = 0.5*(X1[2*i]+X2[2*i]);
-		train_cart.mesh.position.y = 0.5*(Y1[2*i]+Y2[2*i]);
-		train_cart.mesh.rotation.z = h+Math.PI/2;
+		train_cart[i].mesh.position.x = 0.5*(X1[2*i]+X2[2*i]);
+		train_cart[i].mesh.position.y = -0.5*(Y1[2*i]+Y2[2*i]);
+		train_cart[i].mesh.rotation.z = -(h+Math.PI/2);
 		  // stroke(#000000);
 		  // fill(#c03020);
 		  // rect(-0.71*WAGGON_SIZE, -0.35*WAGGON_SIZE, 1.3*WAGGON_SIZE, 0.7*WAGGON_SIZE, 10);

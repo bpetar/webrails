@@ -7,11 +7,13 @@ var rails_straight = {'start_element':true};
 //curve
 var rails_turn = {};
 //cart
-var train_cart = {};
+var train_cart = [{},{},{}];
 //locomotive
-var train_loco = {};
+//var train_loco = {};
 
 var g_startPlaying = false;
+
+var offset = {'x':0, 'y':0};
 
 //rail matrix
 var rail_map = new Array(MAP_SIZE);
@@ -33,8 +35,9 @@ function load_models()
 {
 	globalJSONloader.load( "media/models/rail_flat_straight.js", loadObject(rails_straight));
 	globalJSONloader.load( "media/models/rail_flat_turn.js", loadObject(rails_turn));
-	globalJSONloader.load( "media/models/minecart_v1.json", loadTrainObject(train_cart));
-	globalJSONloader.load( "media/models/handpropelled_railroad_car.json", loadTrainObject(train_loco));
+	globalJSONloader.load( "media/models/handpropelled_railroad_car.json", loadTrainObject(train_cart[0]));
+	globalJSONloader.load( "media/models/minecart_v1.json", loadTrainObject(train_cart[1]));
+	globalJSONloader.load( "media/models/minecart_v1.json", loadTrainObject(train_cart[2]));
 	element_at_hand = rails_straight;
 }
 
@@ -453,6 +456,9 @@ function addElementToMatrix()
 	
 	rail_map[x_coord][y_coord] = {"current_element":current_element,"current_rotation":current_rotation};
 	
-	//console.log(rail_map[x_coord][y_coord]);
+	offset.x = Math.floor(lastMousePosition.x/10);
+	offset.y = Math.floor(lastMousePosition.y/10);
+	
+	console.log(offset.x + ',' + offset.y);
 }
 
