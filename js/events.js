@@ -43,18 +43,25 @@ function onKeyDown(e)
 	else if (e.keyCode == 80) { //p key play train
 		console.log('start playing');
 		g_startPlaying = !g_startPlaying;
+		
+		//play train whistle media/sounds/train_whistle.mp3
+		sound_train_whistle.play();
 	}
-	else if (e.keyCode == 40) { //down key slow down
+	else if (e.keyCode == 38) { //- key slow down
 		DELTA -= 0.1;
 	}
-	else if (e.keyCode == 38) { //up key faster
+	else if (e.keyCode == 107) { //+ key faster
 		DELTA += 0.1;
+	}
+	else if (e.keyCode == 65) { //a key about
+		document.getElementById("id-about").style.display = "block";
+		g_gameStarted = false;
 	}
 }
 
 function onMouseDown (event)
 {
-	if ((!event.ctrlKey)&&(!g_startPlaying)) {
+	if ((!event.ctrlKey)&&(!g_startPlaying)&&(g_gameStarted)) {
 		//if eraser is selected, delete element in this place
 		
 		//if same element already in this place, ignore click
@@ -77,7 +84,7 @@ function onMouseDown (event)
 		NUM_TRACK_SEGMENTS = 0;
 		
 		addElementToMatrix();
-		convertMatrixToTrack();
+		convertMatrixToTrackFixed();
 
 		NUM_TRACK_SEGMENTS = track.length;
 		

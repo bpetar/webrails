@@ -6,9 +6,20 @@ rails todo
 + add train model
 
 
-- gui about
-- sound of train
-- debris
++ gui about
++ sound of train
++ debris
++ [bug] finish track with vertical straight segment, finish track with turn element 3/4
+- [bug] images loading order
+- [bug] clear should clear just player tracks, reset train position, stop play
+- [bug] crossed rail skips track while playing
+- [bug] if rail is not circular it loops at start
++ initial train position
++ loading
+- gui crystal amount increased on every turn
+ - icon and value in gui
+ - animate +number floating on train return
+ - sound of cache flow in
 
 
 
