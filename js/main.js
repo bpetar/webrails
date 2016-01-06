@@ -82,7 +82,7 @@ function layoutModelsAround()
 	
 	//debris
 	debris_coal.mesh.position.set(4,25,0);
-	debris_gold.mesh.position.set(15,-5,0);
+	debris_gold.mesh.position.set(-1,15,0);
 	debris_crystals.mesh.position.set(-37,-22,0);
 	
 	var moreDebris = debris_gold.mesh.clone();
@@ -114,17 +114,20 @@ function layoutModelsAround()
 	//rail home start
 	rail_map[50][49] = {"current_element":1,"current_rotation":1};
 	moreDebris = rails_straight.mesh.clone();
+	moreDebris.name = 'static_rail';
 	moreDebris.position.set(5,5,0);
 	moreDebris.rotation.set(0,0,Math.PI/2);
 	scene.add( moreDebris );
 	rail_map[51][49] = {"current_element":1,"current_rotation":1};
 	moreDebris = rails_straight.mesh.clone();
+	moreDebris.name = 'static_rail';
 	moreDebris.position.set(15,5,0);
 	moreDebris.rotation.set(0,0,Math.PI/2);
 	scene.add( moreDebris );
 	//rail crystal end
 	rail_map[46][51] = {"current_element":1,"current_rotation":1};
 	moreDebris = rails_straight.mesh.clone();
+	moreDebris.name = 'static_rail';
 	moreDebris.position.set(-35,-15,0);
 	moreDebris.rotation.set(0,0,Math.PI/2);
 	scene.add( moreDebris );
@@ -138,7 +141,7 @@ function loadObject( gobject )
 	{
 		materials[ 0 ].shading = THREE.FlatShading;
 		gobject.mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-		gobject.mesh.name = 'rail';
+		gobject.mesh.name = 'first_rail';
 		scene.add( gobject.mesh );
 		if(gobject.start_element == true) 
 			{}
@@ -229,6 +232,17 @@ function loadTrainObject( gobject )
 
 function checkElementDirectionDown(x,y)
 {
+	//crossroad allows to flow through in any direction
+	if(rail_map[x][y].current_element == 3)
+	{
+		if(typeof rail_map[x][y+1] != 'undefined')
+		{
+			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+			//go on, recurse
+			checkElementDirectionDown(x,y+1);
+		}
+	}
+	
 	//we only allow straight elements of rotation 0 and 2 and turns of rotation 2 and 3
 	if(rail_map[x][y].current_element == 1)
 	{
@@ -294,6 +308,17 @@ function checkElementDirectionDown(x,y)
 
 function checkElementDirectionUp(x,y)
 {
+	//crossroad allows to flow through in any direction
+	if(rail_map[x][y].current_element == 3)
+	{
+		if(typeof rail_map[x][y-1] != 'undefined')
+		{
+			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+			//go on, recurse
+			checkElementDirectionUp(x,y-1);
+		}
+	}
+	
 	//we only allow straight elements of rotation 0 and 2 and turns of rotation 0 and 1
 	if(rail_map[x][y].current_element == 1)
 	{
@@ -360,6 +385,17 @@ function checkElementDirectionUp(x,y)
 
 function checkElementDirectionRight(x,y)
 {
+	//crossroad allows to flow through in any direction
+	if(rail_map[x][y].current_element == 3)
+	{
+		if(typeof rail_map[x+1][y] != 'undefined')
+		{
+			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+			//go on, recurse
+			checkElementDirectionRight(x+1,y);
+		}
+	}
+
 	//we only allow straight elements of rotation 1 and 3 and turns of rotation 0 and 3
 	if(rail_map[x][y].current_element == 1)
 	{
@@ -424,6 +460,17 @@ function checkElementDirectionRight(x,y)
 
 function checkElementDirectionLeft(x,y)
 {
+	//crossroad allows to flow through in any direction
+	if(rail_map[x][y].current_element == 3)
+	{
+		if(typeof rail_map[x-1][y] != 'undefined')
+		{
+			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+			//go on, recurse
+			checkElementDirectionLeft(x-1,y);
+		}
+	}
+
 	//we only allow straight elements of rotation 1 and 3 and turns of rotation 1 and 2
 	if(rail_map[x][y].current_element == 1)
 	{
@@ -488,6 +535,19 @@ function checkElementDirectionLeft(x,y)
 
 function convertMatrixToTrackFixed()
 {
+	if(typeof rail_map[52][49] == 'undefined')
+	{
+		//player didnt do anything on the right... lets track leftmost element and start from there?
+		if(typeof rail_map[49][49] != 'undefined')
+		{
+			//there is element on the left, lets go there
+			var x_coord = 51;
+			var y_coord = 49;
+			track.push({'direction':DIRECTION_STRAIGHT,'x':x_coord,'y':y_coord});
+			checkElementDirectionLeft(x_coord-1,y_coord);
+		}
+	}
+	
 	var x_coord = 50;
 	var y_coord = 49;
 	
@@ -617,7 +677,16 @@ function addElementToMatrix()
 	
 	console.log(lastMousePosition.x + ',' + lastMousePosition.y);
 	
-	rail_map[x_coord][y_coord] = {"current_element":current_element,"current_rotation":current_rotation};
+	//if(typeof rail_map[x-1][y] != 'undefined')
+	if ((current_element == 1)&&(typeof rail_map[x_coord][y_coord] != 'undefined')&&(rail_map[x_coord][y_coord].current_element == 1)&&(current_rotation!=rail_map[x_coord][y_coord].current_rotation))
+	{
+		//crossroad hack
+		rail_map[x_coord][y_coord] = {"current_element":3,"current_rotation":0};
+	}
+	else
+	{
+		rail_map[x_coord][y_coord] = {"current_element":current_element,"current_rotation":current_rotation};
+	}
 	
 	//offset.x = Math.floor(lastMousePosition.x/10);
 	//offset.y = Math.floor(lastMousePosition.y/10);

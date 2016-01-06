@@ -10,12 +10,16 @@ rails todo
 + sound of train
 + debris
 + [bug] finish track with vertical straight segment, finish track with turn element 3/4
-- [bug] images loading order
-- [bug] clear should clear just player tracks, reset train position, stop play
-- [bug] crossed rail skips track while playing
-- [bug] if rail is not circular it loops at start
++ images loading order
++ [bug] clear should clear just player tracks, reset train position, stop play, switch element fix
++ [bug] crossed rail skips track while playing - we dont support two or more elements on one square, that is first problem with crossroad
+- [bug] if rail is not circular it loops at start - maybe we could find left most element and start from there??
+- [bug] after clear, play is not working?
+- warning - make circular rail
 + initial train position
 + loading
++ resize window
+- gui menu (about, what else?)
 - gui crystal amount increased on every turn
  - icon and value in gui
  - animate +number floating on train return

@@ -8,18 +8,31 @@ function onKeyDown(e)
 			element_at_hand.mesh.visible = false;
 	 }
 	 else if (e.keyCode == 67) { // c key clear
-	 
-		element_at_hand.mesh = element_at_hand.mesh.clone();
-		element_at_hand.mesh.position.y = lastMousePosition.y;
-		element_at_hand.mesh.position.x = lastMousePosition.x;
-		element_at_hand.mesh.name = 'ruil';
-		scene.add( element_at_hand.mesh );
+	 		
 		for( var i = scene.children.length - 1; i >= 0; i--) 
 		{
 			if(scene.children[i].name == 'rail')
 				scene.remove(scene.children[i]);
 		}
-		element_at_hand.mesh.name = 'rail';
+
+		g_startPlaying = false;
+		
+		//reset train position
+		train_cart[0].mesh.position.set(5,5,0);
+		train_cart[0].mesh.rotation.set(0,0,Math.PI/2);
+		train_cart[1].mesh.position.set(10,5,0);
+		train_cart[1].mesh.rotation.set(0,0,Math.PI/2);
+		train_cart[2].mesh.position.set(15,5,0);
+		train_cart[2].mesh.rotation.set(0,0,Math.PI/2);
+
+		//clear matrix map
+		rail_map = new Array(MAP_SIZE);
+		for (var i = 0; i < MAP_SIZE; i++) {
+		  rail_map[i] = new Array(MAP_SIZE);
+		}
+		rail_map[50][49] = {"current_element":1,"current_rotation":1};
+		rail_map[51][49] = {"current_element":1,"current_rotation":1};
+		rail_map[46][51] = {"current_element":1,"current_rotation":1};
 
 	}
 	else if (e.keyCode == 82) { //r key rotate
@@ -45,7 +58,7 @@ function onKeyDown(e)
 		g_startPlaying = !g_startPlaying;
 		
 		//play train whistle media/sounds/train_whistle.mp3
-		sound_train_whistle.play();
+		if(g_startPlaying) sound_train_whistle.play();
 	}
 	else if (e.keyCode == 38) { //- key slow down
 		DELTA -= 0.1;
@@ -71,11 +84,11 @@ function onMouseDown (event)
 		//cloning fucks up rotation, 3Pi/2 becomes -Pi/2(three.js bug?), which I admit is pretty much the same, matematically speaking,
 		//but it fucks up my rotation logic somehow so we have to save it and assign it manualy
 		//element_at_hand.mesh
-		element_at_hand.mesh = element_at_hand.mesh.clone();
-		element_at_hand.mesh.position.y = lastMousePosition.y;
-		element_at_hand.mesh.position.x = lastMousePosition.x;
-		element_at_hand.mesh.name = 'rail';
-		scene.add( element_at_hand.mesh );
+		var putDownElem = element_at_hand.mesh.clone();
+		putDownElem.position.y = lastMousePosition.y;
+		putDownElem.position.x = lastMousePosition.x;
+		putDownElem.name = 'rail';
+		scene.add( putDownElem );
 		
 		//TODO: play sound
 		
@@ -87,6 +100,8 @@ function onMouseDown (event)
 		convertMatrixToTrackFixed();
 
 		NUM_TRACK_SEGMENTS = track.length;
+		
+		console.log(track);
 		
 		if(NUM_TRACK_SEGMENTS != 0)
 			setup();
@@ -147,3 +162,13 @@ function onDocumentMouseMove(event)
 	return true;
 
 }
+
+			function onWindowResize() {
+				
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				
+
+			}
