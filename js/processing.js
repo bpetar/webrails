@@ -71,6 +71,7 @@ function setup()
   //Y1 = new float[2*NUM_TRAIN_SEGMENTS-1];
   //X2 = new float[2*NUM_TRAIN_SEGMENTS-1];
   //Y2 = new float[2*NUM_TRAIN_SEGMENTS-1];
+  curr_dist = 0;
 }
 
 

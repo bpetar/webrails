@@ -21,6 +21,9 @@ var debris_rail4 = {};
 
 var g_startPlaying = false;
 var g_gameStarted = false;
+var g_railCompleted = false;
+var	g_ConfirmationShown = false;
+var g_trackCompletedNotified = false;
 
 var offset = {'x':0, 'y':0};
 
@@ -52,8 +55,121 @@ function load_sounds()
 	sound_train_whistle.appendChild(source);
 }
 
+var request;
+var progressBar = {};
+
+function loadImage(imageURI)
+{
+	request = new XMLHttpRequest();
+	//request.onloadstart = showProgressBar;
+	request.onprogress = updateProgressBar;
+	request.onload = loadedImage;
+	//request.onloadend = hideProgressBar;
+	request.open("GET", imageURI, true);
+	request.overrideMimeType('text/plain; charset=x-user-defined'); 
+	request.send(null);
+}
+			
+function updateProgressBar(e)
+{
+	if (e.lengthComputable)
+	{
+		progressBar.value = e.loaded / e.total * 100;
+		document.getElementById("id-loading-progress").style.width = "" + progressBar.value + "%";
+	}
+	else
+		progressBar.removeAttribute("value");
+}
+
+function remove_loading_screen()
+{
+	document.getElementById("id-button-continue").style.display = "block";
+	document.getElementById("id-p-loading").innerHTML = "v";
+		
+	
+	
+	// var textShapes = THREE.FontUtils.generateShapes( text, options );
+// var text = new THREE.ShapeGeometry( textShapes );
+// var textMesh = new THREE.Mesh( text, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ) ;
+// scene.add(textMesh);
+
+
+	
+	/*
+	var canvas1 = document.createElement('canvas');
+    var context1 = canvas1.getContext('2d');
+    context1.font = "Bold 40px Arial";
+    context1.fillStyle = "rgba(255,0,0,0.95)";
+    context1.fillText("AGHAAAA", 0, 50);
+
+    var texture1 = new THREE.Texture(canvas1);
+    texture1.needsUpdate = true;
+
+    var material1 = new THREE.MeshBasicMaterial( { map: texture1, side:THREE.DoubleSide } );
+    material1.transparent = true;
+
+    var mesh1 = new THREE.Mesh(
+        new THREE.PlaneGeometry(10, 4),
+        material1
+    );
+
+    mesh1.position.set(10,10,10);
+
+    scene.add( mesh1 );*/
+	
+	
+	
+}
+
+function loadedImage()
+{
+	// our big texture is loaded, we can remove loading screen
+	setTimeout(function(){remove_loading_screen()}, 1400);
+	
+
+	console.log("that loaded");
+	// init model positions
+	layoutModelsAround();
+}
+
+			
 function load_models()
 {
+	
+	{
+			//console.log("this loaded");
+			
+			loadImage('media/models/rail_set_atlas.png');
+			
+			// instantiate a loader
+			/*var loader = new THREE.TextureLoader();
+
+			// load a resource
+			loader.load(
+				// resource URL
+				'media/textures/rail_set_atlas.png',
+				// Function when resource is loaded
+				function ( texture ) {
+					// our big texture is loaded, we can remove loading screen
+					document.getElementById("id-button-continue").style.display = "block";
+					document.getElementById("id-p-loading").innerHTML = "v";
+					
+					console.log("that loaded");
+					// init model positions
+					layoutModelsAround();
+				},
+				// Function called when download progresses
+				function ( xhr ) {
+					console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+				},
+				// Function called when download errors
+				function ( xhr ) {
+					console.log( 'An error happened' );
+				}
+			);*/
+			
+		}
+		
 	globalJSONloader.load( "media/models/rail_flat_straight.js", loadObject(rails_straight));
 	globalJSONloader.load( "media/models/rail_flat_turn.js", loadObject(rails_turn));
 	globalJSONloader.load( "media/models/handpropelled_railroad_car.json", loadTrainObject(train_cart[0]));
@@ -132,6 +248,11 @@ function layoutModelsAround()
 	moreDebris.rotation.set(0,0,Math.PI/2);
 	scene.add( moreDebris );
 
+	track = [];
+	track.push({'direction':DIRECTION_STRAIGHT,'x':50,'y':49});
+	track.push({'direction':DIRECTION_STRAIGHT,'x':51,'y':49});
+	NUM_TRACK_SEGMENTS = track.length;
+	setup();
 }
 
 
@@ -155,7 +276,7 @@ function loadObject( gobject )
 		//gobject.mesh.position.x -= 2.5;
 		
 		g_numModels++;
-		
+		console.log("that loaded");
 		// if(g_numModels == 6)
 		// {
 			// document.getElementById("id-button-continue").style.display = "block";
@@ -173,7 +294,7 @@ function loadDebrisObject( gobject )
 		scene.add( gobject.mesh );
 		
 		g_numModels++;
-		
+		console.log("that loaded");
 		//if(g_numModels == 6)
 		// {
 			// document.getElementById("id-button-continue").style.display = "block";
@@ -192,52 +313,31 @@ function loadTrainObject( gobject )
 		scene.add( gobject.mesh );
 		
 		g_numModels++;
-		
+		console.log("that loaded");
 		//if(g_numModels == 6)
-		{
-			//console.log("this loaded");
-			
-			
-			// instantiate a loader
-			var loader = new THREE.TextureLoader();
-
-			// load a resource
-			loader.load(
-				// resource URL
-				'media/textures/rail_set_atlas.png',
-				// Function when resource is loaded
-				function ( texture ) {
-					// our big texture is loaded, we can remove loading screen
-					document.getElementById("id-button-continue").style.display = "block";
-					document.getElementById("id-p-loading").innerHTML = "v";
-					
-					console.log("that loaded");
-					// init model positions
-					layoutModelsAround();
-				},
-				// Function called when download progresses
-				function ( xhr ) {
-					console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-				},
-				// Function called when download errors
-				function ( xhr ) {
-					console.log( 'An error happened' );
-				}
-			);
-			
-		}
+		
 	}
 }
 
+function notifyTrackCompleted()
+{
+	if(!g_trackCompletedNotified)
+	{
+		floatingTextRailCompleted = makeText("Track Completed!", {'x':lastMousePosition.x+3, 'y':lastMousePosition.y-1, 'z':5}, {r:15, g:215, b:20, a:1.0}, 44);
+		drawTextRailCompleted = true;
+		g_trackCompletedNotified = true;
+	}
+}
 
 function checkElementDirectionDown(x,y)
 {
 	//crossroad allows to flow through in any direction
 	if(rail_map[x][y].current_element == 3)
 	{
+		track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+
 		if(typeof rail_map[x][y+1] != 'undefined')
 		{
-			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
 			//go on, recurse
 			checkElementDirectionDown(x,y+1);
 		}
@@ -253,13 +353,15 @@ function checkElementDirectionDown(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+
 			if(typeof rail_map[x][y+1] != 'undefined')
 			{
-				track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
 				//go on, recurse
 				checkElementDirectionDown(x,y+1);
 			}
@@ -274,14 +376,16 @@ function checkElementDirectionDown(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_LEFT,'x':x,'y':y});
+
 			if(typeof rail_map[x+1][y] != 'undefined')
 			{
 				//turn left
-				track.push({'direction':DIRECTION_LEFT,'x':x,'y':y});
 				checkElementDirectionRight(x+1,y);//dont let this left/right confuse you
 			}
 		}
@@ -291,14 +395,16 @@ function checkElementDirectionDown(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_RIGHT,'x':x,'y':y});
+
 			if(typeof rail_map[x-1][y] != 'undefined')
 			{
 				//turn right
-				track.push({'direction':DIRECTION_RIGHT,'x':x,'y':y});
 				checkElementDirectionLeft(x-1,y);
 			}
 		}
@@ -311,9 +417,10 @@ function checkElementDirectionUp(x,y)
 	//crossroad allows to flow through in any direction
 	if(rail_map[x][y].current_element == 3)
 	{
+		track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+
 		if(typeof rail_map[x][y-1] != 'undefined')
 		{
-			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
 			//go on, recurse
 			checkElementDirectionUp(x,y-1);
 		}
@@ -329,13 +436,15 @@ function checkElementDirectionUp(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+
 			if(typeof rail_map[x][y-1] != 'undefined')
 			{
-				track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
 				//go on, recurse
 				checkElementDirectionUp(x,y-1);
 			}
@@ -350,14 +459,16 @@ function checkElementDirectionUp(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_LEFT,'x':x,'y':y});
+
 			if(typeof rail_map[x-1][y] != 'undefined')
 			{
 				//turn left
-				track.push({'direction':DIRECTION_LEFT,'x':x,'y':y});
 				checkElementDirectionLeft(x-1,y);
 			}
 		}
@@ -367,14 +478,16 @@ function checkElementDirectionUp(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_RIGHT,'x':x,'y':y});
+
 			if(typeof rail_map[x+1][y] != 'undefined')
 			{
 				//turn right
-				track.push({'direction':DIRECTION_RIGHT,'x':x,'y':y});
 				checkElementDirectionRight(x+1,y);
 			}
 		}
@@ -388,9 +501,10 @@ function checkElementDirectionRight(x,y)
 	//crossroad allows to flow through in any direction
 	if(rail_map[x][y].current_element == 3)
 	{
+		track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+		
 		if(typeof rail_map[x+1][y] != 'undefined')
 		{
-			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
 			//go on, recurse
 			checkElementDirectionRight(x+1,y);
 		}
@@ -406,13 +520,15 @@ function checkElementDirectionRight(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+
 			if(typeof rail_map[x+1][y] != 'undefined')
 			{
-				track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
 				//go on, recurse
 				checkElementDirectionRight(x+1,y);
 			}
@@ -426,14 +542,16 @@ function checkElementDirectionRight(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_RIGHT,'x':x,'y':y});
+
 			if(typeof rail_map[x][y+1] != 'undefined')
 			{
 				//turn me down
-				track.push({'direction':DIRECTION_RIGHT,'x':x,'y':y});
 				checkElementDirectionDown(x,y+1);
 			}
 		}
@@ -443,13 +561,15 @@ function checkElementDirectionRight(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_LEFT,'x':x,'y':y});
+
 			if(typeof rail_map[x][y-1] != 'undefined')
 			{
-				track.push({'direction':DIRECTION_LEFT,'x':x,'y':y});
 				//turn me up
 				checkElementDirectionUp(x,y-1);
 			}
@@ -463,9 +583,10 @@ function checkElementDirectionLeft(x,y)
 	//crossroad allows to flow through in any direction
 	if(rail_map[x][y].current_element == 3)
 	{
+		track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+
 		if(typeof rail_map[x-1][y] != 'undefined')
 		{
-			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
 			//go on, recurse
 			checkElementDirectionLeft(x-1,y);
 		}
@@ -481,13 +602,15 @@ function checkElementDirectionLeft(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
+
 			if(typeof rail_map[x-1][y] != 'undefined')
 			{
-				track.push({'direction':DIRECTION_STRAIGHT,'x':x,'y':y});
 				//go on, recurse
 				checkElementDirectionLeft(x-1,y);
 			}
@@ -502,14 +625,16 @@ function checkElementDirectionLeft(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_LEFT,'x':x,'y':y});
+
 			if(typeof rail_map[x][y+1] != 'undefined')
 			{
 				//turn me down
-				track.push({'direction':DIRECTION_LEFT,'x':x,'y':y});
 				checkElementDirectionDown(x,y+1);
 			}
 		}
@@ -519,13 +644,15 @@ function checkElementDirectionLeft(x,y)
 			{
 				console.log("track is completed!");
 				console.log(track);
+				g_railCompleted = true; notifyTrackCompleted();
 				NUM_TRACK_SEGMENTS = track.length;
 				return;
 			}
 			
+			track.push({'direction':DIRECTION_RIGHT,'x':x,'y':y});
+
 			if(typeof rail_map[x][y-1] != 'undefined')
 			{
-				track.push({'direction':DIRECTION_RIGHT,'x':x,'y':y});
 				//turn me up
 				checkElementDirectionUp(x,y-1);
 			}
@@ -533,27 +660,54 @@ function checkElementDirectionLeft(x,y)
 	}
 }
 
+function findLeftmost(x,y)
+{
+	return 'izes ga, nije ravan';
+}
+
+function convertMatrixToTrackFixedL()
+{
+		var x_coord = 49;
+		var y_coord = 49;
+		
+		//we have element to the right, lets go there.
+		track.push({'direction':DIRECTION_LEFT,'x':x_coord,'y':y_coord});
+		checkElementDirectionRight(x_coord+1,y_coord);
+
+}
+
 function convertMatrixToTrackFixed()
 {
-	if(typeof rail_map[52][49] == 'undefined')
+	//if(typeof rail_map[52][49] != 'undefined')
+	{
+		//go right
+		var x_coord = 50;
+		var y_coord = 49;
+		
+		//we have element to the right, lets go there.
+		track.push({'direction':DIRECTION_STRAIGHT,'x':x_coord,'y':y_coord});
+		checkElementDirectionRight(x_coord+1,y_coord);
+
+	}
+	//else if(typeof rail_map[49][49] != 'undefined')
 	{
 		//player didnt do anything on the right... lets track leftmost element and start from there?
-		if(typeof rail_map[49][49] != 'undefined')
+		/*var leftmost = findLeftmost(51,49);
+		
+		if(leftmost != 'izes ga, nije ravan')
 		{
-			//there is element on the left, lets go there
-			var x_coord = 51;
-			var y_coord = 49;
+			var x_coord = leftmost.x;
+			var y_coord = leftmost.y;
+			
+			//set offset
+			offset.x = x_coord-50;
+			offset.y = 49-y_coord;
+
 			track.push({'direction':DIRECTION_STRAIGHT,'x':x_coord,'y':y_coord});
-			checkElementDirectionLeft(x_coord-1,y_coord);
-		}
+			checkElementDirectionRight(x_coord+1,y_coord);
+		}*/
 	}
 	
-	var x_coord = 50;
-	var y_coord = 49;
-	
-	//we have element to the right, lets go there.
-	track.push({'direction':DIRECTION_STRAIGHT,'x':x_coord,'y':y_coord});
-	checkElementDirectionRight(x_coord+1,y_coord);
 }
 
 function convertMatrixToTrack()
@@ -675,7 +829,7 @@ function addElementToMatrix()
 	var x_coord = MAP_SIZE/2 + Math.floor(lastMousePosition.x/10);
 	var y_coord = MAP_SIZE - (MAP_SIZE/2 + Math.floor(lastMousePosition.y/10) + 1);
 	
-	console.log(lastMousePosition.x + ',' + lastMousePosition.y);
+	//console.log(lastMousePosition.x + ',' + lastMousePosition.y);
 	
 	//if(typeof rail_map[x-1][y] != 'undefined')
 	if ((current_element == 1)&&(typeof rail_map[x_coord][y_coord] != 'undefined')&&(rail_map[x_coord][y_coord].current_element == 1)&&(current_rotation!=rail_map[x_coord][y_coord].current_rotation))

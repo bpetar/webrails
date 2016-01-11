@@ -9,9 +9,16 @@
 	<body>
 	
 		<div id="id-loading" style="z-index:122;position:absolute;/* top: 0; */margin:0 auto;width: 100%; height: 100%;opacity: 0.6; background: url(media/textures/train.jpg);background-size: 100%;">
-
+		
 		</div>
+		
 	
+		<div id="id-confirmation" style="display:none; z-index:323; position:absolute; left:50%; margin: 100px 0 0 -150px; width: 300px; height: 130px; opacity: 0.9; background: black; border: 1px solid gray;">
+			<p id="id-confirmation-text" style="color:ffeeee; text-align: center; font-size:14px; ">Are you sure?</p>
+			<br>
+			<input id="id-button-confirmation-yes" style="cursor:pointer; position:absolute; width:100px; height:30px; left:50%; margin: 0 0 0 -105px;" type="button" value="Yes" onclick="confirmationYes()">
+			<input id="id-button-confirmation-no" style="cursor:pointer; position:absolute; width:100px; height:30px; left:50%; margin: 0 0 0 5px;" type="button" value="No" onclick="confirmationNo()">
+		</div>
 	
 	
 	
@@ -21,6 +28,7 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		
+		<script src="js/utils.js"></script>
 		<script src="js/processing.js"></script>
 		<script src="js/main.js"></script>
 		<script src="js/events.js"></script>
@@ -83,11 +91,37 @@
 			load_models();
 			load_sounds();
 
+			var drawText = false;
+			var drawTextRailCompleted = false;
+			var floatingText;
+			var floatingTextRailCompleted;
+			
 			var render = function () {
 				requestAnimationFrame( render );
 				controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 				stats.update();
 				if(g_startPlaying) draw();
+				
+				if(drawText)
+				{
+					floatingText.position.z += 0.1;
+					if(floatingText.position.z > 10)
+					{
+						drawText = false;
+						floatingText.visible = false;
+					}
+				}
+				
+				if(drawTextRailCompleted)
+				{
+					floatingTextRailCompleted.position.z += 0.1;
+					if(floatingTextRailCompleted.position.z > 17)
+					{
+						drawTextRailCompleted = false;
+						floatingTextRailCompleted.visible = false;
+					}
+				}
+				
 				renderer.render(scene, camera);
 			};
 
@@ -111,30 +145,35 @@
 		
 		
 		
-		<div id="id-about" style="z-index:132; padding:20px; position:absolute; width:800px; height:600px; bottom:0; left:50%; margin:-150px 0 0 -400px; background:black">
-        <p style="text-align: center; color:white; font-size:32px; ">Train Game Demo</p>
-		<input id="id-button-continue" style="display:none; position:absolute; width:150px; height:40px; left:50%; margin: 0 0 0 -75px;" type="button" value="Continue" onclick="startDemo()">
-		<p id="id-p-loading" style="color:ffeeee; text-align: center; font-size:20px; ">Loading...</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp;</p>
+		<div id="id-about" style="z-index:132; padding:20px; position:absolute; width:800px; height:500px; bottom:0; left:50%; margin:-150px 0 0 -400px; background:black">
 
-		<p style="color:ffeeee; font-size:20px; ">In this demo you can layout tracks on the map and then run the train along the path. </p>
+
+        <p style="text-align: center; color:white; font-size:26px; ">Train Game Demo</p>
+		<div id="id-loading-progress" style="z-index:1539;position:relative; top: 0; margin-bottom:10px; width: 0%; height: 10px; background: lightgreen">
+		</div>
+		<input id="id-button-continue" style="cursor:pointer; display:none; position:absolute; width:150px; height:40px; left:50%; margin: 0 0 0 -75px;" type="button" value="Continue" onclick="startDemo()">
+		<p id="id-p-loading" style="color:ffeeee; text-align: center; font-size:16px; ">Loading...</p>
+<p style="color:ddddaa; font-size:12px; line-height: 0px;">&nbsp;&nbsp;</p>
+
+		<p style="color:ffeeee; font-size:14px; ">In this demo you can layout tracks on the map and then run the train along the path. Make sure you have circular tracks otherwise train might act weird.</p>
 		
-		<p style="color:ffeeee; font-size:20px; ">Commands:</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp; 1 - select straight rail element</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp; 2 - select turn rail element</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp; r - rotate element</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp; c - clear scene</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp; p - play/stop the train animation on the tracks</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp; + - speed up train</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp; - - slow down</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp; ctrl + mouse press and move - rotate (left), pan (right)</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp; mouse wheel - zoom</p>
+		<p style="color:ffeeee; font-size:14px; ">Commands:</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp; a - about (this dialog on/off)</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp; 1 - select straight rail element</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp; 2 - select turn rail element</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp; r - rotate element</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp; c - clear scene</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp; p - play/stop the train animation on the tracks</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp; + - speed up train</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp; - - slow down</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp; ctrl + mouse press and move - rotate (left), pan (right)</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp; mouse wheel - zoom</p>
 
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp;</p>
-<p style="color:ffeeee; font-size:20px; ">Credits:</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp;Stanislav Ocovaj</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp;Zorana Markovic</p>
-<p style="color:ddddaa; font-size:20px; line-height: 0px;">&nbsp;&nbsp;Petar Bajic</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp;</p>
+<p style="color:ffeeee; font-size:14px; ">Credits:</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp;Stanislav Ocovaj</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp;Zorana Markovic</p>
+<p style="color:ddddaa; font-size:14px; line-height: 0px;">&nbsp;&nbsp;Petar Bajic</p>
 
 
     </div>

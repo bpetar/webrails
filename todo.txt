@@ -14,16 +14,31 @@ rails todo
 + [bug] clear should clear just player tracks, reset train position, stop play, switch element fix
 + [bug] crossed rail skips track while playing - we dont support two or more elements on one square, that is first problem with crossroad
 - [bug] if rail is not circular it loops at start - maybe we could find left most element and start from there??
-- [bug] after clear, play is not working?
-- warning - make circular rail
++ [bug] after clear, play is not working?
++ warning - make circular rail
++ are you sure confirmation dialog
++ progress loading
++ p press should behave like esc, element at hand should be hidden, then shown back again on stop
++ a add to about
 + initial train position
 + loading
 + resize window
-- gui menu (about, what else?)
++ track completed keeps poping
+- free memory of text sprites
+- add money - no money - no build.
+- shadows
+- animation to use elapsed time frames
++ scale down about screen
+- isometric camera
+- leave about helpers hanging on the screen - show help instructions in the corner
+- gui menu (about, gold, what else?)
+- test framerate with 100s of rails and models
 - gui crystal amount increased on every turn
  - icon and value in gui
  - animate +number floating on train return
  - sound of cache flow in
+ - detect when train at mine - fill carts with crystals
+ - detect when train at home - empty carts and increase crystal
 
 
 
@@ -37,6 +52,7 @@ rails todo
 
 - camera follows train
 
+- vagons to wobble waddle, clickety clack, shake and jump, move a little bit assimetric
 
 + add tracks to matrix, matrix to path
 - calculate path errors
@@ -45,8 +61,10 @@ rails todo
 
 - erase elements
 - replace elements
+- undo
 - prevent stacking of elements
 - prevent placing track out of the map
+
 
 - gui for picking elements
 - gui play button

@@ -16,6 +16,7 @@ function onKeyDown(e)
 		}
 
 		g_startPlaying = false;
+		element_at_hand.mesh.visible = true;
 		
 		//reset train position
 		train_cart[0].mesh.position.set(5,5,0);
@@ -33,6 +34,14 @@ function onKeyDown(e)
 		rail_map[50][49] = {"current_element":1,"current_rotation":1};
 		rail_map[51][49] = {"current_element":1,"current_rotation":1};
 		rail_map[46][51] = {"current_element":1,"current_rotation":1};
+		track = [];
+		track.push({'direction':DIRECTION_STRAIGHT,'x':50,'y':49});
+		track.push({'direction':DIRECTION_STRAIGHT,'x':51,'y':49});
+		NUM_TRACK_SEGMENTS = track.length;
+		setup();
+		
+		g_railCompleted = false;
+		g_trackCompletedNotified = false;
 
 	}
 	else if (e.keyCode == 82) { //r key rotate
@@ -55,26 +64,58 @@ function onKeyDown(e)
 	}
 	else if (e.keyCode == 80) { //p key play train
 		console.log('start playing');
-		g_startPlaying = !g_startPlaying;
 		
-		//play train whistle media/sounds/train_whistle.mp3
-		if(g_startPlaying) sound_train_whistle.play();
+		if(!g_startPlaying)
+		{
+			//player wants to start the train
+			if(!g_railCompleted)
+			{
+				showConfirmation("Rail tracks doesnt seem to be completed. Are you sure you want to run the train?", RunTheTrain);
+			}
+			else
+			{
+				RunTheTrain();
+			}
+		}
+		else
+		{
+			g_startPlaying = !g_startPlaying;
+			element_at_hand.mesh.visible = true;
+		}		
 	}
-	else if (e.keyCode == 38) { //- key slow down
+	else if (e.keyCode == 109) { //- key slow down
 		DELTA -= 0.1;
 	}
 	else if (e.keyCode == 107) { //+ key faster
 		DELTA += 0.1;
 	}
 	else if (e.keyCode == 65) { //a key about
-		document.getElementById("id-about").style.display = "block";
-		g_gameStarted = false;
+		document.getElementById("id-loading").style.display = "none";
+		if(g_gameStarted)
+		{
+			//g_gameStarted
+			document.getElementById("id-about").style.display = "block";
+			g_gameStarted = false;
+		}
+		else
+		{
+			document.getElementById("id-about").style.display = "none";
+			g_gameStarted = true;
+		}
 	}
+}
+
+function RunTheTrain()
+{
+	if(!g_railCompleted) console.log('rail should be completed before running the train');
+	sound_train_whistle.play();
+	g_startPlaying = !g_startPlaying;
+	element_at_hand.mesh.visible = false;
 }
 
 function onMouseDown (event)
 {
-	if ((!event.ctrlKey)&&(!g_startPlaying)&&(g_gameStarted)) {
+	if ((!event.ctrlKey)&&(!g_startPlaying)&&(g_gameStarted)&&(!g_ConfirmationShown)) {
 		//if eraser is selected, delete element in this place
 		
 		//if same element already in this place, ignore click
@@ -95,9 +136,20 @@ function onMouseDown (event)
 		//reset track
 		track = [];
 		NUM_TRACK_SEGMENTS = 0;
+		g_railCompleted = false;
 		
 		addElementToMatrix();
 		convertMatrixToTrackFixed();
+		
+		if(!g_railCompleted)
+		{
+			g_trackCompletedNotified = false;
+		}
+		
+		if(typeof floatingText != 'undefined') floatingText.visible = false;
+		floatingText = makeText("-1119$", {'x':lastMousePosition.x+8, 'y':lastMousePosition.y-1, 'z':0}, {r:215, g:215, b:20, a:1.0}, 34);
+		drawText = true;
+
 
 		NUM_TRACK_SEGMENTS = track.length;
 		
@@ -165,9 +217,17 @@ function onDocumentMouseMove(event)
 
 			function onWindowResize() {
 				
-				camera.aspect = window.innerWidth / window.innerHeight;
+				//camera.aspect = window.innerWidth / window.innerHeight;
+				//camera.updateProjectionMatrix();
+
+				camera.left = window.innerWidth / - 2;
+				camera.right = window.innerWidth / 2;
+				camera.top = window.innerHeight / 2;
+				camera.bottom = window.innerHeight / - 2;
+
 				camera.updateProjectionMatrix();
 
+				
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				
 
