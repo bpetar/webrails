@@ -1,6 +1,8 @@
 # webrails
 Small demo for 3D trains/rails game
 
+![alt tag](screenshot.png)
+
 Instructions:
 Lay rail tracks around and press 'p' to have train appear and circle around it.
 
